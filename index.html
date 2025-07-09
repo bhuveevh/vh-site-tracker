@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>vH-Site Tracker (VACANCYHAI.ONLINE)</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>vH-Site Tracker (VACANCYHAI.ONLINE)</h1>
+
+    <div class="top-bar">
+      <div class="site-dropdown-wrapper">
+        <button onclick="toggleSitePopup()" class="site-popup-btn">🌐 Sites ▼</button>
+        <div id="site-popup" class="site-popup"></div>
+      </div>
+
+      <div class="date-dropdown-wrapper">
+        <button id="date-popup-btn" class="site-popup-btn">📅 Date ▼</button>
+        <div id="date-popup" class="site-popup date-popup"></div>
+      </div>
+
+      <input type="url" id="site-url" placeholder="Enter website URL" />
+      <button onclick="addWebsite()">Add</button>
+    </div>
+
+    <div class="post-table" id="post-table-container">
+      <p>Select a site to load posts...</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="script.js"></script>
+</body>
+</html>
