@@ -92,6 +92,23 @@ h1 small {
   background: #f0f0f0;
 }
 
+#clear-cache-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #555;
+  color: #fff;
+  padding: 8px 14px;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+#clear-cache-btn:hover {
+  background: #000;
+}
 .site-popup-item button {
   background: red;
   color: #fff;
