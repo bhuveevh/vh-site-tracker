@@ -70,7 +70,7 @@ function populateSites() {
     item.className = "site-popup-item" + (url === currentSite ? " active" : "");
     item.innerHTML = `
       <span onclick="selectSite('${url}')">${url}</span>
-      <button onclick="deleteWebsite('${url}')">✕</button>
+      <button onclick="deleteWebsite('${url}')">\u2715</button>
     `;
     popup.appendChild(item);
   });
@@ -110,7 +110,7 @@ function setupCalendar() {
 
 async function fetchPosts(siteUrl) {
   try {
-    const res = await fetch(siteUrl.replace(/\/$/, "") + "/wp-json/wp/v2/posts?per_page=50&_embed");
+    const res = await fetch(siteUrl.replace(/\/$/, "") + "/wp-json/wp/v2/posts?per_page=50&_embed&_ts=" + Date.now());
     if (res.ok) {
       const js = await res.json();
       return js.map(p => {
@@ -119,7 +119,7 @@ async function fetchPosts(siteUrl) {
           id: `${siteUrl}-wp-${p.id}`,
           title: p.title.rendered,
           category: cat,
-          updated: new Date(p.date).toISOString(), // full date-time
+          updated: new Date(p.date).toISOString(),
           link: p.link
         };
       });
@@ -135,7 +135,7 @@ async function fetchPosts(siteUrl) {
         id: `${siteUrl}-rss-${it.guid}`,
         title: it.title,
         category: it.categories[0] || "RSS",
-        updated: new Date(it.pubDate).toISOString(), // full date-time
+        updated: new Date(it.pubDate).toISOString(),
         link: it.link
       }));
     }
@@ -152,17 +152,17 @@ async function loadPosts(siteUrl = currentSite || websites[0]) {
   if (!siteUrl) return;
 
   const isRealtime = !pick;
+  const cacheExpired = !postCache[siteUrl] || (Date.now() - postCache[siteUrl].time > 2 * 60 * 1000);
 
-  if (!postCache[siteUrl] || (Date.now() - postCache[siteUrl].time > 2 * 60 * 1000)) {
+  if (cacheExpired) {
     const posts = await fetchPosts(siteUrl);
     postCache[siteUrl] = { posts, time: Date.now() };
   }
 
-  const all = postCache[siteUrl].posts;
-
+  const all = postCache[siteUrl].posts || [];
   let filtered;
+
   if (isRealtime) {
-    // Show all posts that are <= now
     filtered = all.filter(p => new Date(p.updated) <= now);
   } else {
     const selDate = new Date(pick).toISOString().split("T")[0];
@@ -217,6 +217,22 @@ function highlightSelectedSite() {
   });
 }
 
+function clearCache() {
+  postCache = {};
+  localStorage.removeItem("postCacheTime");
+  if (currentSite) loadPosts(currentSite);
+}
+
+function autoClearCacheAtMidnight() {
+  const lastCleared = localStorage.getItem("postCacheTime");
+  const today = new Date().toISOString().split("T")[0];
+  if (lastCleared !== today) {
+    postCache = {};
+    localStorage.setItem("postCacheTime", today);
+  }
+}
+
 window.onload = () => {
+  autoClearCacheAtMidnight();
   populateSites();
 };
