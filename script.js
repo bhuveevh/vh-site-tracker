@@ -165,8 +165,16 @@ async function loadPosts(siteUrl = currentSite || websites[0]) {
   if (isRealtime) {
     filtered = all.filter(p => new Date(p.updated) <= now);
   } else {
-    const selDate = new Date(pick).toISOString().split("T")[0];
-    filtered = all.filter(p => p.updated.startsWith(selDate));
+    const selDate = new Date(pick);
+    const start = new Date(selDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(selDate);
+    end.setHours(23, 59, 59, 999);
+
+    filtered = all.filter(p => {
+      const updatedTime = new Date(p.updated);
+      return updatedTime >= start && updatedTime <= end;
+    });
   }
 
   renderPosts(filtered);
